@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>One-way DOM Binder</title>
+	<style>
+		div.test {
+			border: 1px solid;
+			margin: 10px;
+			padding: 10px 15px;
+		}
+		[data-test]::after, [data-name]::after, [data-age]::after {
+			display: inline-block;
+			border: 1px solid blue;
+			color: red;
+			margin: 5px;
+			padding: 10px 15px;
+		}
+		[data-test]::after {
+			content: "Attribute [data-test]: " attr(data-test);
+		}
+		[data-name]::after {
+			content: "Attribute [data-name]: " attr(data-name);
+		}
+		[data-age]::after {
+			content: "Attribute [data-age]: " attr(data-age);
+		}
+	</style>
+	<script src="dom-binder.js"></script>
+</head>
+<body>
+	<div class="test">
+		Name: {{name}}; Age: {{age}};
+		<div>
+			Name: <b>{{name}}</b>; Age: <b>{{age}}</b>;
+		</div>
+		<div>
+			Name: {{name}}; Age: {{age}};
+		</div>
+		<div data-test="Name: {{name}}; Age: {{age}};"></div>
+		<span data-name="{{name}}" data-age="{{age}}"></span>
+		{{msg}}
+	</div>
+	<div class="test">
+		Name: {{name}}
+		<div data-test="{{name}}-{{age}}-test">
+			Welcome <b data-name="{{name}}">{{name}}</b>
+		</div>
+		{{msg}}
+	</div>
+	<div class="test late">
+		<h3>Later Binding</h3>
+		Name: {{name}}
+		<div data-test="{{name}}-{{age}}-test" data-info="{{info}}">
+			Welcome <b data-name="{{name}}">{{name}}</b>
+		</div>
+		{{msg}}
+	</div>
+	<script>
+		let nodes = document.querySelectorAll("div.test");
+		let b = new Bindable(nodes[0], nodes[1]);
+		b.values.age = 30;
+		b.values.name = 'Krishna';
+
+		b.setValues({
+			name: 'Anshu',
+			age: 25
+		});
+
+		{
+			let msg = document.createElement('span');
+			msg.innerHTML = 'This is a span containing the message';
+			b.values.msg = msg;
+			console.log('"b.values.msg" after first binding'.padEnd(35), b.nodes.msg);
+		}
+		
+		let late = document.querySelector('div.late');
+		b.bindElements(late);
+		b.values.info = {a:10, b:20};
+		console.log('"b.values.msg" after second binding'.padEnd(35), b.nodes.msg);
+
+		b.unbindElements(nodes[0]);
+		console.log('"b.values.msg" after unbinding'.padEnd(35), b.nodes.msg);
+	</script>
+</body>
+</html>
