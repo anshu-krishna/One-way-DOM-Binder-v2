@@ -99,15 +99,15 @@ This library provides a class called ```Bindable``` which facilitates an easy wa
 	Result:
 	```html
 	<div id="mydiv">
-		Name: Anshu; DOB: 5 Jun;
+		Name: Krishna; DOB: 5 Jun;
 		<div>
-			Name: <b>Anshu</b>; DOB: <b>5 Jun</b>;
+			Name: <b>Krishna</b>; DOB: <b>5 Jun</b>;
 		</div>
 		<div>
-			Name: Anshu; DOB: 5 Jun;
+			Name: Krishna; DOB: 5 Jun;
 		</div>
-		<div data-info="Name: Anshu; DOB: 5 Jun;"></div>
-		<span data-name="Anshu" data-age="5 Jun"></span>
+		<div data-info="Name: Krishna; DOB: 5 Jun;"></div>
+		<span data-name="Krishna" data-age="5 Jun"></span>
 	</div>
 	```
 
