@@ -32,8 +32,6 @@
 	<div id="mydiv">{{date}}</div>
 	<div class="test">
 		Name: {{name}}; Age: {{age}};
-		<br />
-		Born in: {{year}};
 		<div>
 			Name: <b>{{name}}</b>; Age: <b>{{age}}</b>;
 		</div>
@@ -62,18 +60,13 @@
 	<script>
 		let nodes = document.querySelectorAll("div.test");
 		let b = new Bindable(nodes[0], nodes[1]);
-		b.formatters.year = age => {
-			let d = new Date();
-			return d.getFullYear() - age;
-		};
 		b.values.age = 30;
 		b.values.year = 30;
 		b.values.name = 'Krishna';
 
 		b.setValues({
 			name: 'Anshu',
-			age: 100,
-			year: 100
+			age: 100
 		});
 
 		{
