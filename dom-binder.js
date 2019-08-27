@@ -9,7 +9,9 @@ class Bindable {
 		Object.defineProperties(this, {
 			__values: notEnum,
 			__targetStorage: notEnum,
-			__targets: notEnum
+			__targets: notEnum,
+			__formatters: notEnum,
+			__formatted: notEnum
 		});
 		this.__values = {};
 		this.values = new Proxy(this.__values, {
@@ -22,10 +24,48 @@ class Bindable {
 			set: (obj, prop, value) => {
 				if(value === null) {
 					delete obj[prop];
+					delete this.__formatted[prop];
 				} else {
 					obj[prop] = value;
+					delete this.__formatted[prop];
 				}
 				this.__updateValue(prop);
+			}
+		});
+		this.__formatted = {};
+		this.formatted = new Proxy(this.__formatted, {
+			get: (obj, prop) => {
+				if(typeof obj[prop] === 'undefined') {
+					let val = this.values[prop];
+					let formatter = this.formatters[prop];
+					if(typeof formatter === 'function') {
+						val = formatter(val);
+					}
+					obj[prop] = val;
+				}
+				return obj[prop];
+			}
+		});
+		this.__formatters = {};
+		this.formatters = new Proxy(this.__formatters, {
+			get: (obj, prop) => {
+				if(typeof obj[prop] === 'undefined') {
+					return null;
+				}
+				return obj[prop];
+			},
+			set: (obj, prop, value) => {
+				if(value === null) {
+					delete obj[prop];
+					delete this.__formatted[prop];
+					this.__updateValue(prop);
+				} else if(typeof value === 'function') {
+					obj[prop] = value;
+					delete this.__formatted[prop];
+					this.__updateValue(prop);
+				} else {
+					console.error('Only functions can be assigned as formatter');
+				}
 			}
 		});
 		this.__targetStorage = [];
@@ -148,6 +188,7 @@ class Bindable {
 		}
 		for(let key of Object.keys(obj)) {
 			this.__values[key] = obj[key];
+			delete this.__formatted[key];
 			this.__updateValue(key);
 		}
 	}
@@ -190,7 +231,7 @@ Object.defineProperties(Bindable, {
 			setValue(bindable) {
 				switch(this.node.nodeType) {
 					case 2:
-						let prop = new Map(this.depends.map(key => [key, Bindable.__valueToString(bindable.values[key])]));
+						let prop = new Map(this.depends.map(key => [key, Bindable.__valueToString(bindable.formatted[key])]));
 						let val = this.str.map((v, i) => {
 							if(i % 2 === 0) return v;
 							return prop.get(v);
@@ -198,7 +239,7 @@ Object.defineProperties(Bindable, {
 						this.node.nodeValue = val;
 						break;
 					case 3:
-						let replacement = bindable.values[this.depends[0]];
+						let replacement = bindable.formatted[this.depends[0]];
 						if(replacement instanceof HTMLElement) {
 							replacement = replacement.cloneNode(true);
 						} else {

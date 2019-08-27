@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<title>One-way DOM Binder</title>
 	<style>
-		div.test {
+		div.test, #mydiv {
 			border: 1px solid;
 			margin: 10px;
 			padding: 10px 15px;
@@ -29,8 +29,11 @@
 	<script src="dom-binder.js"></script>
 </head>
 <body>
+	<div id="mydiv">{{date}}</div>
 	<div class="test">
 		Name: {{name}}; Age: {{age}};
+		<br />
+		Born in: {{year}};
 		<div>
 			Name: <b>{{name}}</b>; Age: <b>{{age}}</b>;
 		</div>
@@ -59,12 +62,18 @@
 	<script>
 		let nodes = document.querySelectorAll("div.test");
 		let b = new Bindable(nodes[0], nodes[1]);
+		b.formatters.year = age => {
+			let d = new Date();
+			return d.getFullYear() - age;
+		};
 		b.values.age = 30;
+		b.values.year = 30;
 		b.values.name = 'Krishna';
 
 		b.setValues({
 			name: 'Anshu',
-			age: 25
+			age: 100,
+			year: 100
 		});
 
 		{
@@ -81,6 +90,20 @@
 
 		b.unbindElements(nodes[0]);
 		console.log('"b.values.msg" after unbinding'.padEnd(35), b.nodes.msg);
+
+		let b2 = new Bindable(document.querySelector('#mydiv'));
+		b2.formatters.date = (value) => {
+			let d = Date.parse(value);
+			if(isNaN(d)) {
+				d = new Date();
+			}
+			return new Intl.DateTimeFormat('en-GB', {
+				day: '2-digit',
+				month: 'short',
+				year: 'numeric'
+			}).format(d);
+		};
+		b2.values.date = '2019-06-05';
 	</script>
 </body>
 </html>
