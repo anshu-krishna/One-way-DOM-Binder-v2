@@ -239,6 +239,7 @@ Object.defineProperties(Bindable, {
 						this.node.nodeValue = val;
 						break;
 					case 3:
+					case 1:
 						let replacement = bindable.formatted[this.depends[0]];
 						if(replacement instanceof HTMLElement) {
 							replacement = replacement.cloneNode(true);
