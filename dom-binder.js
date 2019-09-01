@@ -39,7 +39,7 @@ class Bindable {
 					let val = this.values[prop];
 					let formatter = this.formatters[prop];
 					if(typeof formatter === 'function') {
-						val = formatter(val);
+						val = formatter(val, prop, this);
 					}
 					obj[prop] = val;
 				}
